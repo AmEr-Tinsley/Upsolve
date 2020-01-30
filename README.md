@@ -11,7 +11,7 @@
  
  **Main actors :**
   - Admin (Manage Users and has all privileges)
-  - Trainer (Manage the training adding problems , usefull links and blogs ..)
+  - Trainer (Manage the training : adding problems , usefull links and blogs ..)
   - Trainee (Consult pages and comment blogs)
 
 ## Login page :
