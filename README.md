@@ -28,7 +28,7 @@
   ### Home page:
   ![Main Screen](Screenshots/admin.PNG)
 
-  ### Requests (Trainers asks to be approved for training)
+  ### Requests page (Trainers asks to be approved for training) :
   ![Main Screen](Screenshots/requests.PNG)
   
 ## Blog page Example:
