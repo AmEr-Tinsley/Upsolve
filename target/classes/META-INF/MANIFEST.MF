@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Implementation-Title: Upsolve
+Implementation-Version: 0.0.1-SNAPSHOT
+Built-By: WIKI
+Implementation-Vendor-Id: com.upsolve
+Build-Jdk: 1.8.0_231
+Implementation-URL: https://projects.spring.io/spring-boot/#/spring-bo
+ ot-starter-parent/upsolve
+Created-By: Maven Integration for Eclipse
+

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<title>Upsolve</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+ 	<link href="https://cdn.quilljs.com/1.1.6/quill.snow.css" rel="stylesheet">
+ 	<link rel="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.quilljs.com/1.1.6/quill.js"></script> <!-- Create the editor container -->
+    <script rel="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+   
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	
+
+ 
+<style>
+#wa{
+	width:1170px;
+	height : 45px;
+	 background-color:#1b262c;
+    color : white;
+}
+#waa{
+	width:1170px;
+	height : 65px;
+	 background-color:#1b262c;
+    color : white;
+}
+#editor {
+    height: 375px;
+    background-color:#1b262c;
+    color : white;
+}
+nav {
+  .navbar-brand {font-size: 30px;}
+	.navbar-toggle {margin: 13px 15px 13px 0;}
+	a {
+		font-size: 18px;
+		padding-bottom: 20px !important;
+		padding-top: 20px !important;
+    transition: all 0.3s ease;
+	}
+}
+body {
+  background: #1b262c;
+  padding-top: 60px;
+}
+.row{
+		    margin-top:40px;
+		    padding: 0 10px;
+		}
+		.clickable{
+		    cursor: pointer;   
+		}
+
+		.panel-heading div {
+			margin-top: -18px;
+			font-size: 15px;
+		}
+		.panel-heading div span{
+			margin-left:5px;
+		}
+		.panel-body{
+			display: none;
+		}
+		.container {
+  padding: 2rem 0rem;
+}
+
+h4 {
+  margin: 2rem 0rem 1rem;
+}
+
+.table-image {
+  td, th {
+    vertical-align: middle;
+  }
+}
+</style>
+
+</head>
+<body>
+
+		<nav class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      
+ <a href="#" class="navbar-brand"><img style="max-width:7rem; margin-top: -28px;" src="https://i.ibb.co/KFL65K0/aaaa-4x-8.png"></a>    </div>
+    <div class="collapse navbar-collapse">
+      <ul class="nav navbar-nav pull-right">
+        <li><a href="/">Home</a></li>
+       
+        <li ><a href="/blogs">Blogs</a></li>
+         <li class="active" sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_TRAINER')"><a th:href="@{/writeblog(user=${#authentication.name})}">Write Blog</a></li>
+         <li sec:authorize="hasRole('ROLE_ADMIN')"><a href="/admin">Back</a></li>
+       
+		<li>
+		<a href="/showMyLoginPage?action=logout" class="btn btn-lg">
+          <span class="glyphicon glyphicon-log-out"></span> Log out
+        </a>
+		<!--<input type="submit" value="Logout"  />-->
+		</li>
+        
+      </ul>
+     
+    </div>
+    </div>
+    </nav>
+
+
+<br>
+<br>
+<br>
+<span id="myvar" th:text="${blog.content}" style="display:none"></span>
+<div class = "container">
+ <form id="myform" th:action="@{/processUpdateBlog(user=${#authentication.name})}" 
+                    			 th:object="${blog}" method="POST"
+                               class="form-horizontal">
+ <h1 style="color:white;">Blog Title</h1>
+ <br>
+  <input id = "wa" th:field="*{title}" name="Title" type="text">
+  <br>
+   <div th:if="${#fields.hasErrors('title')}"
+               style="margin-bottom: 25px" class="text-danger">
+               <ul>
+                 <li class ="text-left" th:each="err : ${#fields.errors('title')}" th:text="'Title ' + ${err}" />
+               </ul>                       
+   </div>
+  <br>
+  <input  th:field="*{id}" name="Title" type="hidden">
+    <input  th:field="*{addedby}" name="Title" type="hidden">
+  
+  <br>
+  <h1 style="color:white;">Description</h1>
+  <br>
+  <input id = "waa" th:field="*{description}" name="Description" type="text" >
+  <br>
+  <div th:if="${#fields.hasErrors('description')}"
+               style="margin-bottom: 25px" class="text-danger">
+               <ul>
+                 <li  class ="text-left" th:each="err : ${#fields.errors('description')}" th:text="'Description ' + ${err}" />
+               </ul>                       
+   </div>
+  <br>
+  <br>
+  <h1 style="color:white;">Blog Content</h1>
+  <br>
+ 
+  
+<div id="editor">
+</div>
+ <textarea name="text" style="display:none" id = "hiddeninput" th:field="*{content}"></textarea>
+<div th:if="${#fields.hasErrors('content')}"
+               style="margin-bottom: 25px" class="text-danger">
+               <ul>
+                 <li  class ="text-left" th:each="err : ${#fields.errors('content')}" th:text="'Content ' + ${err}" />
+               </ul>                       
+   </div>
+<br>
+
+ <div style="margin-left: 0px" class="form-group">                       
+        <div>
+        <button type="submit" class="btn btn-primary">Update the Blog</button>
+       	</div>
+</div>
+</form>
+</div>
+
+<script>
+$( document ).ready(function() {
+	var quill = new Quill('#editor', {
+	theme: 'snow'
+	});
+	
+	var wa = document.getElementById("myvar").innerHTML;
+	console.log(wa)
+	var delta = quill.clipboard.convert(wa);
+     quill.setContents(delta);
+     
+     delta = quill.clipboard.convert(quill.getText(0));
+     quill.setContents(delta);
+     
+     
+	
+	$('#myform').submit(function(event) {	
+		 var text = quill.getText(0);
+		 var html = quill.root.innerHTML.split('  ').join(' &nbsp;')
+		 
+		
+		 event.preventDefault(); //this will prevent the default submit
+		 $( '#hiddeninput').val(html);
+		 $(this).unbind('submit').submit(); // continue the submit unbind preventDefault
+		})
+	
+	});
+
+</script>
+</body>
+</html>

@@ -1,0 +1,707 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<title>Upsolve</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://code.jquery.com/jquery.min.js"></script>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+<style>
+
+.error {color:red}
+nav {
+  .navbar-brand {font-size: 30px;}
+	.navbar-toggle {margin: 13px 15px 13px 0;}
+	a {
+		font-size: 18px;
+		padding-bottom: 20px !important;
+		padding-top: 20px !important;
+    transition: all 0.3s ease;
+	}
+}
+body {
+  background: #1b262c;
+  padding-top: 60px;
+}
+.row{
+		    margin-top:40px;
+		    padding: 0 10px;
+		}
+		.clickable{
+		    cursor: pointer;   
+		}
+
+		.panel-heading div {
+			margin-top: -18px;
+			font-size: 15px;
+		}
+		.panel-heading div span{
+			margin-left:5px;
+		}
+		.panel-body{
+			display: none;
+		}
+		.container {
+  padding: 2rem 0rem;
+}
+
+h4 {
+  margin: 2rem 0rem 1rem;
+}
+
+.table-image {
+  td, th {
+    vertical-align: middle;
+  }
+}
+
+</style>
+
+</head>
+<body>
+
+		<nav class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a href="#" class="navbar-brand"><img style="max-width:7rem; margin-top: -28px;" src="https://i.ibb.co/KFL65K0/aaaa-4x-8.png"></a>
+      <!--  <span class="navbar-brand" style="color:#ffffff;">UPSOLVE</span> -->
+    </div>
+    <div class="collapse navbar-collapse">
+      <ul class="nav navbar-nav pull-right">
+        <li class="active"><a href="#">Home</a></li>
+        
+        <li><a href="/blogs">Blogs</a></li>
+         <li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_TRAINER')"><a th:href="@{/writeblog(user=${#authentication.name})}">Write Blog</a></li>
+        <li sec:authorize="hasRole('ROLE_ADMIN')"><a href="/admin">Back</a></li>
+        <li>
+		
+		<a href="/showMyLoginPage?action=logout" class="btn btn-lg">
+          <span class="glyphicon glyphicon-log-out"></span> Log out
+        </a>
+		<!--<input type="submit" value="Logout"  />-->
+		</li>
+        
+      </ul>
+      
+    </div><!--/.nav-collapse -->
+  </div>
+</nav>
+	 	
+		<br>
+		<br>
+		
+		<div class="container">
+		<div class="row" sec:authorize="hasRole('ROLE_TRAINEE')">
+		<div class="col-xs-8" style="color: cornsilk;" >
+		<h3 sec:authorize="hasRole('ROLE_TRAINEE')" >Welcome <span sec:authentication="name"></span> !</h3>
+		</div>
+		</div>
+		<div class="row" sec:authorize="hasRole('ROLE_TRAINER')">
+		
+		<div class="col-xs-8" style="color: cornsilk;">
+			<span id="myvar" th:text="${errr}" style="display:none"></span>
+			<span id="linkvar" th:text="${errrr}" style="display:none"></span>
+			<span id="updateproblemSpan" th:text="${updateproblem}" style="display:none"></span>
+			<span id="updatelinkSpan" th:text="${updatelink}" style="display:none"></span>
+			<h3 >Welcome <span sec:authentication="name"></span> !</h3>
+		
+        <span class="text-caption"> You may Add some useful problems/links thank you !</span>
+        </div>
+    <div class="col-xs-4">
+    	<div class="text-right">
+        	 
+        	
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLong">Add Problem</button>
+			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLongg"> Add Link</button>
+
+        </div>
+    </div>
+</div>
+
+    	<div class="row">
+    	<div class="col-md-6">
+				<div class="panel panel-primary">
+					<div class="panel-heading">
+						<h3 class="panel-title">Tasks</h3>
+						<div class="pull-right">
+							<span class="clickable filter" data-toggle="tooltip" title="Toggle table filter" data-container="body">
+								<i class="glyphicon glyphicon-filter"></i>
+							</span>
+						</div>
+					</div>
+					<div class="panel-body">
+						<input type="text" class="form-control" id="task-table-filter" data-action="filter" data-filters="#task-table" placeholder="Filter Problems" />
+					</div>
+					<table class="table table-hover" id="task-table">
+						<thead>
+							<tr>
+								<th>Problem</th>
+								<th>type</th>
+								<th sec:authorize="hasRole('ROLE_TRAINEE')">Status</th>
+								<th sec:authorize="hasAnyRole('ROLE_TRAINER','ROLE_ADMIN')">Actions</th>
+								<th>Added By</th>
+							</tr>
+						</thead>
+						<tbody>
+								<div th:each="tempProblem : ${problems}">
+									<div th:switch="${tempProblem.value}">
+										<tr th:case="'OK'" th:style="${tempProblem.key.addedby == #authentication.name ? 'background-color:powderblue;':'background-color:#ccff99;'}">
+											<td>
+												<a th:href="@{${tempProblem.key.link}}"><span th:text="${tempProblem.key.name}"></span></a>
+											</td>
+											<td th:text="${tempProblem.key.type}"/>
+											<td sec:authorize="hasRole('ROLE_TRAINEE')"> Accepted/Solved </td>
+											<td sec:authorize="hasAnyRole('ROLE_TRAINER','ROLE_ADMIN')" >
+											<div th:if="${tempProblem.key.addedby == #authentication.name} ">
+											<a th:href="@{/showUpdateproblem(link=${tempProblem.key.link})}" class="btn btn-info btn-sm">
+													<i class="glyphicon glyphicon-pencil"></i>
+											</a>
+		           							<a  th:href="@{/delete(problemlink=${tempProblem.key.link})}" class="btn btn-danger btn-sm" onclick="if (!(confirm('Are you sure you want to delete this problem?'))) return false">
+											<i class="glyphicon glyphicon-trash"></i>
+											</a>
+											</div>
+											
+		           							</td>
+		           							<td th:text="${tempProblem.key.addedby}"/>
+										</tr>
+										<tr th:case="'WRONG_ANSWER'" th:style="${tempProblem.key.addedby == #authentication.name ? 'background-color:powderblue;':'background-color:#ff6666;'}">
+											<td>
+												<a th:href="@{${tempProblem.key.link}}"><span th:text="${tempProblem.key.name}"></span></a>
+											</td>
+											<td th:text="${tempProblem.key.type}"/>
+											<td sec:authorize="hasRole('ROLE_TRAINEE')">Wrong Attempt</td>
+											<td sec:authorize="hasAnyRole('ROLE_TRAINER','ROLE_ADMIN')">
+											<div  th:if="${tempProblem.key.addedby == #authentication.name}">
+											<a th:href="@{/showUpdateproblem(link=${tempProblem.key.link})}" class="btn btn-info btn-sm">
+													<i class="glyphicon glyphicon-pencil"></i>
+											</a>
+		           							<a  th:href="@{/delete(problemlink=${tempProblem.key.link})}" class="btn btn-danger btn-sm" onclick="if (!(confirm('Are you sure you want to delete this problem?'))) return false">
+											<i class="glyphicon glyphicon-trash"></i>
+											</a>
+											</div>
+		           							</td>
+		           							<td th:text="${tempProblem.key.addedby}"/>
+										</tr>
+										<tr th:case="'notyet'" th:style="${tempProblem.key.addedby == #authentication.name ? 'background-color:powderblue;':''}" >
+											<td>
+												<a th:href="@{${tempProblem.key.link}}"><span th:text="${tempProblem.key.name}"></span></a>
+											</td>
+											<td th:text="${tempProblem.key.type}"/>
+											<td sec:authorize="hasRole('ROLE_TRAINEE')"> Not Solved yet</td>
+											<td sec:authorize="hasAnyRole('ROLE_TRAINER,ROLE_ADMIN')">
+											<div th:if="${tempProblem.key.addedby == #authentication.name OR #authorization.expression('hasRole(''ADMIN'')')}">
+											
+								
+											<a th:href="@{/showUpdateproblem(link=${tempProblem.key.link})}" class="btn btn-info btn-sm" >
+													<i class="glyphicon glyphicon-pencil"></i>
+											</a>
+											
+		           							<a  th:href="@{/delete(problemlink=${tempProblem.key.link})}" class="btn btn-danger btn-sm" onclick="if (!(confirm('Are you sure you want to delete this problem?'))) return false">
+											<i class="glyphicon glyphicon-trash"></i>
+											</a>
+											</div>
+		           							</td>
+		           							<td th:text="${tempProblem.key.addedby}"/>
+										</tr>
+									</div>
+									</div>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="col-md-6">
+					<div class="panel panel-primary">
+					<div class="panel-heading">
+						<h3 class="panel-title">Useful links</h3>
+						<div class="pull-right">
+							<span class="clickable filter" data-toggle="tooltip" title="Toggle table filter" data-container="body">
+								<i class="glyphicon glyphicon-filter"></i>
+							</span>
+						</div>
+					</div>
+					<div class="panel-body">
+						<input type="text" class="form-control" id="dev-table-filter" data-action="filter" data-filters="#dev-table" placeholder="Filter Links" />
+					</div>
+					<table class="table table-hover" id="dev-table">
+						<thead>
+							<tr>
+								<th>Link</th>
+								<th>Resource</th>
+								<th>Topic about</th>
+								<th sec:authorize="hasAnyRole('ROLE_TRAINER','ROLE_ADMIN')">Actions</th>
+								<th>Added by</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="tempLink : ${links}" th:style="${tempLink.addedby == #authentication.name ? 'background-color:powderblue;':''}">
+									
+										<td>
+											<a th:href="@{${tempLink.link}}"><span th:text="${tempLink.name}"></span></a>
+										</td>
+										<td th:text="${tempLink.resource}"/>
+										<td th:text="${tempLink.about}"/>
+										<td sec:authorize="hasAnyRole('ROLE_TRAINER','ROLE_ADMIN')">
+											<div th:if="${tempLink.addedby == #authentication.name OR #authorization.expression('hasRole(''ADMIN'')')}">
+												<a th:href="@{/showUpdatelink(link=${tempLink.link})}" class="btn btn-info btn-sm">
+														<i class="glyphicon glyphicon-pencil"></i>
+												</a>
+			           							<a  th:href="@{/deletelink(link=${tempLink.link})}" class="btn btn-danger btn-sm" onclick="if (!(confirm('Are you sure you want to delete this problem?'))) return false">
+												<i class="glyphicon glyphicon-trash"></i>
+												</a>
+											
+	           							</td>
+	           							<td th:text="${tempLink.addedby}"/>
+           							</div>
+								</tr>
+							
+						</tbody>
+					</table>
+				</div>
+			</div>
+		
+		
+		
+			</div>
+			</div>
+			
+<!-- ***********************************************************************MODALS *************************************************************************************************************************** -->
+
+
+<!-- Modal add problem-->
+<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+       
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h3 class ="text-left">Add problem</h3>
+      </div>
+      <div class="modal-body">
+        	<form th:action="@{/processAddProblemForm(user=${#authentication.name})}" 
+                               th:object="${AddProblemChecker}" method="POST"
+                               class="form-horizontal">
+
+                        <!-- Place for messages: error, alert etc ... -->
+                        <div class="form-group">
+                            <div class="col-xs-15">
+                                <div>
+                                
+                                    <!-- Check for registration error -->
+                                    <div th:if="${AddProblemError}" class="alert alert-danger col-xs-offset-1 col-xs-10">
+                                        This problem already exists !
+                                    </div>
+                                                                                                            
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Link -->
+                        <div style="margin-bottom: 25px" class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-plus"></i></span> 
+                            <input type="text" th:field="*{link}" placeholder="Link" class="form-control" />
+                        </div>
+
+                        <div th:if="${#fields.hasErrors('link')}"
+                            style="margin-bottom: 25px" class="text-danger">
+                            <ul>
+                              <li class ="text-left" th:each="err : ${#fields.errors('link')}" th:text="'Link ' + ${err}" />
+                            </ul>                       
+                        </div>
+                         
+                        
+                        <!-- Name -->
+                        <div style="margin-bottom: 25px" class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-plus"></i></span> 
+                            <input type="text" th:field="*{name}" placeholder="Name" class="form-control" th:errorclass="fieldError" />
+                        </div>
+                        <div th:if="${#fields.hasErrors('name')}"
+                            style="margin-bottom: 25px" class="text-danger">
+                            <ul>
+                              <li class ="text-left" th:each="err : ${#fields.errors('name')}" th:text="'Name ' + ${err}" />
+                            </ul>                       
+                        </div>
+                        
+                         <!-- Type -->
+                        <div style="margin-bottom: 25px" class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-plus"></i></span> 
+                            <input type="text" th:field="*{type}" placeholder="Type of the problem" class="form-control" th:errorclass="fieldError" />
+                        </div>
+                        <div th:if="${#fields.hasErrors('type')}"
+                            style="margin-bottom: 25px" class="text-danger">
+                            <ul>
+                              <li class ="text-left" th:each="err : ${#fields.errors('type')}" th:text="'Type ' + ${err}" />
+                            </ul>                       
+                        </div>
+                        
+                        
+                        <!-- Register Button -->
+                        <div style="margin-top: 10px" class="form-group">                       
+                            <div class="col-sm-8 controls">
+                                <button type="submit" class="btn btn-success">Add Problem</button>
+                                 <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                        
+                    </form>
+      </div>
+     
+    </div>
+  </div>
+</div>
+
+<!-- Modal add link -->
+<div class="modal fade" id="exampleModalLongg" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+       
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h3 class ="text-left">Add link</h3>
+      </div>
+      <div class="modal-body">
+        	 <form th:action="@{/processAddLinkForm(user=${#authentication.name})}" 
+                               th:object="${LinkChecker}" method="POST"
+                               class="form-horizontal">
+
+                        <!-- Place for messages: error, alert etc ... -->
+                        <div class="form-group">
+                            <div class="col-xs-15">
+                                <div>
+                                
+                                    <!-- Check for registration error -->
+                                    <div th:if="${AddLinkError}" class="alert alert-danger col-xs-offset-1 col-xs-10">
+                                        This Link already exists !
+                                    </div>
+                                                                                                            
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Link -->
+                        <div style="margin-bottom: 25px" class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-plus"></i></span> 
+                            <input type="text" th:field="*{link}" placeholder="Link" class="form-control" />
+                        </div>
+
+                        <div th:if="${#fields.hasErrors('link')}"
+                            style="margin-bottom: 25px" class="text-danger">
+                            <ul>
+                              <li class ="text-left"  th:each="err : ${#fields.errors('link')}" th:text="'Link ' + ${err}" />
+                            </ul>                       
+                        </div>
+                         
+                        
+                        <!-- Name -->
+                        <div style="margin-bottom: 25px" class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-plus"></i></span> 
+                            <input type="text" th:field="*{name}" placeholder="Name" class="form-control" th:errorclass="fieldError" />
+                        </div>
+                        <div th:if="${#fields.hasErrors('name')}"
+                            style="margin-bottom: 25px" class="text-danger">
+                            <ul>
+                              <li class ="text-left" th:each="err : ${#fields.errors('name')}" th:text="'Name ' + ${err}" />
+                            </ul>                       
+                        </div>
+                        
+                         <!-- Resource -->
+                        <div style="margin-bottom: 25px" class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-plus"></i></span> 
+                            <input type="text" th:field="*{resource}" placeholder="Resource of this link" class="form-control" th:errorclass="fieldError" />
+                        </div>
+                        <div th:if="${#fields.hasErrors('resource')}"
+                            style="margin-bottom: 25px" class="text-danger">
+                            <ul>
+                              <li class ="text-left" th:each="err : ${#fields.errors('resource')}" th:text="'Type ' + ${err}" />
+                            </ul>                       
+                        </div>
+                        <!-- Topic -->
+                        <div style="margin-bottom: 25px" class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-plus"></i></span> 
+                            <input type="text" th:field="*{about}" placeholder="Topic about this link" class="form-control" th:errorclass="fieldError" />
+                        </div>
+                        <div th:if="${#fields.hasErrors('about')}"
+                            style="margin-bottom: 25px" class="text-danger">
+                            <ul>
+                              <li class ="text-left" th:each="err : ${#fields.errors('about')}" th:text="'Type ' + ${err}" />
+                            </ul>                       
+                        </div>
+                        
+                        
+                        <!-- Add Button -->
+                        <div style="margin-top: 10px" class="form-group">                       
+                            <div class="col-sm-8 controls">
+                                <button type="submit" class="btn btn-success" >Add Link</button>
+                                 <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                        
+                    </form>
+
+      </div>
+     
+    </div>
+  </div>
+</div>
+
+<!-- Modal update problem -->
+<div class="modal fade" id="updateproblem" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+       
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h3 class ="text-left">Update Problem</h3>
+      </div>
+      <div class="modal-body">
+        	  <form th:action="@{/processUpdateProblem(user=${#authentication.name})}" 
+                    			 th:object="${problem}" method="POST"
+                               class="form-horizontal">
+
+                    
+
+                        <!-- Link -->
+                       <!--  --> <div style="margin-bottom: 25px" class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-plus"></i></span> 
+                            <input  type="text" th:field="*{link}" placeholder="Link" class="form-control" readonly>
+                        </div>
+
+                        <div th:if="${#fields.hasErrors('link')}"
+                            style="margin-bottom: 25px" class="text-danger">
+                            <ul>
+                              <li th:each="err : ${#fields.errors('link')}" th:text="'Link ' + ${err}" />
+                            </ul>                       
+                        </div>
+                         
+                        
+                        <!-- Name -->
+                        <div style="margin-bottom: 25px" class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-plus"></i></span> 
+                            <input type="text" th:field="*{name}" placeholder="Name" class="form-control" th:errorclass="fieldError" />
+                        </div>
+                        <div th:if="${#fields.hasErrors('name')}"
+                            style="margin-bottom: 25px" class="text-danger">
+                            <ul>
+                              <li th:each="err : ${#fields.errors('name')}" th:text="'Name ' + ${err}" />
+                            </ul>                       
+                        </div>
+                        
+                         <!-- Type -->
+                        <div style="margin-bottom: 25px" class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-plus"></i></span> 
+                            <input type="text" th:field="*{type}" placeholder="Type of the problem" class="form-control" th:errorclass="fieldError" />
+                        </div>
+                        <div th:if="${#fields.hasErrors('type')}"
+                            style="margin-bottom: 25px" class="text-danger">
+                            <ul>
+                              <li th:each="err : ${#fields.errors('type')}" th:text="'Type ' + ${err}" />
+                            </ul>                       
+                        </div>
+                        
+                        
+                        <div style="margin-top: 10px" class="form-group">                       
+                            <div class="col-sm-6 controls">
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </div>
+                        </div>
+                        
+                    </form>
+
+      </div>
+     
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal update link -->
+<div class="modal fade" id="updatelink" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+       
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h3 class ="text-left">Update Link</h3>
+      </div>
+      <div class="modal-body">
+        	  <form th:action="@{/processUpdateLink(user=${#authentication.name})}" 
+                    			 th:object="${link}" method="POST"
+                               class="form-horizontal">
+
+                        
+
+                        <!-- Link -->
+                        <div style="margin-bottom: 25px" class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-plus"></i></span> 
+                            <input type="text" th:field="*{link}" placeholder="Link" class="form-control" readonly />
+                        </div>
+
+                        <div th:if="${#fields.hasErrors('link')}"
+                            style="margin-bottom: 25px" class="text-danger">
+                            <ul>
+                              <li th:each="err : ${#fields.errors('link')}" th:text="'Link ' + ${err}" />
+                            </ul>                       
+                        </div>
+                         
+                        
+                        <!-- Name -->
+                        <div style="margin-bottom: 25px" class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-plus"></i></span> 
+                            <input type="text" th:field="*{name}" placeholder="Name" class="form-control" th:errorclass="fieldError" />
+                        </div>
+                        <div th:if="${#fields.hasErrors('name')}"
+                            style="margin-bottom: 25px" class="text-danger">
+                            <ul>
+                              <li th:each="err : ${#fields.errors('name')}" th:text="'Name ' + ${err}" />
+                            </ul>                       
+                        </div>
+                        
+                         <!-- Resource -->
+                        <div style="margin-bottom: 25px" class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-plus"></i></span> 
+                            <input type="text" th:field="*{resource}" placeholder="Resource of this link" class="form-control" th:errorclass="fieldError" />
+                        </div>
+                        <div th:if="${#fields.hasErrors('resource')}"
+                            style="margin-bottom: 25px" class="text-danger">
+                            <ul>
+                              <li th:each="err : ${#fields.errors('resource')}" th:text="'Type ' + ${err}" />
+                            </ul>                       
+                        </div>
+                        <!-- Topic -->
+                        <div style="margin-bottom: 25px" class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-plus"></i></span> 
+                            <input type="text" th:field="*{about}" placeholder="Topic about this link" class="form-control" th:errorclass="fieldError" />
+                        </div>
+                        <div th:if="${#fields.hasErrors('about')}"
+                            style="margin-bottom: 25px" class="text-danger">
+                            <ul>
+                              <li th:each="err : ${#fields.errors('about')}" th:text="'Type ' + ${err}" />
+                            </ul>                       
+                        </div>
+                        
+                        
+                        <!-- Add Button -->
+                        <div style="margin-top: 10px" class="form-group">                       
+                            <div class="col-sm-6 controls">
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </div>
+                        </div>
+                        
+                    </form>
+
+      </div>
+     
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+<script>
+$(window).on('load',function(){
+	var err = document.getElementById("myvar").innerHTML;
+	var errr =  document.getElementById("linkvar").innerHTML;
+	var updp = document.getElementById("updateproblemSpan").innerHTML;
+	var updl = document.getElementById("updatelinkSpan").innerHTML;
+	console.log(err);
+	console.log(errr);
+	console.log(updp);
+	console.log(updl);
+	if(err == 1)
+    	$('#exampleModalLong').modal('show');
+	if(errr == 1)
+		$('#exampleModalLongg').modal('show');
+	if(updp == 1)
+		$('#updateproblem').modal('show');
+	if(updl == 1)
+		$('#updatelink').modal('show');
+});
+
+$(window).scroll(function() {
+	  if ($(document).scrollTop() > 50) {
+	    $('nav').addClass('shrink');
+	  } else {
+	    $('nav').removeClass('shrink');
+	  }
+	});
+(function(){
+    'use strict';
+	var $ = jQuery;
+	$.fn.extend({
+		filterTable: function(){
+			return this.each(function(){
+				$(this).on('keyup', function(e){
+					$('.filterTable_no_results').remove();
+					var $this = $(this), 
+                        search = $this.val().toLowerCase(), 
+                        target = $this.attr('data-filters'), 
+                        $target = $(target), 
+                        $rows = $target.find('tbody tr');
+                        
+					if(search == '') {
+						$rows.show(); 
+					} else {
+						$rows.each(function(){
+							var $this = $(this);
+							$this.text().toLowerCase().indexOf(search) === -1 ? $this.hide() : $this.show();
+						})
+						if($target.find('tbody tr:visible').size() === 0) {
+							var col_count = $target.find('tr').first().find('td').size();
+							var no_results = $('<tr class="filterTable_no_results"><td colspan="'+col_count+'">No results found</td></tr>')
+							$target.find('tbody').append(no_results);
+						}
+					}
+				});
+			});
+		}
+	});
+	$('[data-action="filter"]').filterTable();
+})(jQuery);
+
+$(function(){
+    // attach table filter plugin to inputs
+	$('[data-action="filter"]').filterTable();
+	
+	$('.container').on('click', '.panel-heading span.filter', function(e){
+		var $this = $(this), 
+			$panel = $this.parents('.panel');
+		
+		$panel.find('.panel-body').slideToggle();
+		if($this.css('display') != 'none') {
+			$panel.find('.panel-body input').focus();
+		}
+	});
+	$('[data-toggle="tooltip"]').tooltip();
+})
+</script>
+
+</body>
+</html>

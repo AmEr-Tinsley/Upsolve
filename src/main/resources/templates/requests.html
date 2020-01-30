@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<title>Upsolve</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+
+<style>
+nav {
+  .navbar-brand {font-size: 30px;}
+	.navbar-toggle {margin: 13px 15px 13px 0;}
+	a {
+		font-size: 18px;
+		padding-bottom: 20px !important;
+		padding-top: 20px !important;
+    transition: all 0.3s ease;
+	}
+}
+body {
+  background: #1b262c;
+  padding-top: 60px;
+}
+.row{
+		    margin-top:40px;
+		    padding: 0 10px;
+		}
+		.clickable{
+		    cursor: pointer;   
+		}
+
+		.panel-heading div {
+			margin-top: -18px;
+			font-size: 15px;
+		}
+		.panel-heading div span{
+			margin-left:5px;
+		}
+		.panel-body{
+			display: none;
+		}
+		.container {
+  padding: 2rem 0rem;
+}
+
+h4 {
+  margin: 2rem 0rem 1rem;
+}
+
+.table-image {
+  td, th {
+    vertical-align: middle;
+  }
+}
+</style>
+
+</head>
+<body>
+
+		<nav class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      
+ <a href="#" class="navbar-brand"><img style="max-width:7rem; margin-top: -28px;" src="https://i.ibb.co/KFL65K0/aaaa-4x-8.png"></a>    </div>
+    <div class="collapse navbar-collapse">
+      <ul class="nav navbar-nav pull-right">
+        <li><a th:href="@{/admin}">Home</a></li>
+        
+        <li class="active"><a href="/blogs">Requests</a></li>
+        
+      <li><a th:href="@{/}">Content pages</a>
+        
+        
+        <li>
+		
+		<a href="/showMyLoginPage?action=logout" class="btn btn-lg">
+          <span class="glyphicon glyphicon-log-out"></span> Log out
+        </a>
+		<!--<input type="submit" value="Logout"  />-->
+		</li>
+        
+      </ul>
+      
+    </div><!--/.nav-collapse -->
+    
+  </div>
+</nav>
+
+<div class="container">
+		
+
+
+    	<div class="row">
+    	<div class="col-md-9">
+				<div class="panel panel-success">
+					<div class="panel-heading">
+						<h3 class="panel-title">Trainers</h3>
+						<div class="pull-right">
+							<span class="clickable filter" data-toggle="tooltip" title="Toggle table filter" data-container="body">
+								<i class="glyphicon glyphicon-filter"></i>
+							</span>
+						</div>
+					</div>
+					<div class="panel-body">
+						<input type="text" class="form-control" id="task-table-filter" data-action="filter" data-filters="#task-table" placeholder="Filter Tasks" />
+					</div>
+					<table class="table table-hover" id="task-table">
+						<thead>
+							<tr>
+								<th>Username</th>
+								<th>Email</th>
+								<th>Approve/Decline</th>
+							</tr>
+						</thead>
+						<tbody>
+								<tr th:each="temptrainer : ${trainers}">
+									
+									<td th:text="${temptrainer.userName}"/>
+									<td th:text="${temptrainer.email}"/>									
+									<td>
+           							<a  th:href="@{/approveUser(username=${temptrainer.userName})}" class="btn btn-success btn-sm" onclick="if (!(confirm('Are you sure you want to confirm this trainer request?'))) return false">
+									<i class="material-icons">done</i>
+
+
+									</a>
+									
+									<a  th:href="@{/declineUser(username=${temptrainer.userName})}" class="btn btn-danger btn-sm" onclick="if (!(confirm('Are you sure you want to decline this trainer's request?'))) return false">
+									<i class="material-icons">clear</i>
+
+									
+									</a>
+									
+           							</td>
+								</tr>
+				
+							
+						</tbody>
+					</table>
+				</div>
+			</div>
+			</div>
+			</div>
+	 
+
+
+
+
+
+
+
+
+
+
+<script>
+$(window).scroll(function() {
+	  if ($(document).scrollTop() > 50) {
+	    $('nav').addClass('shrink');
+	  } else {
+	    $('nav').removeClass('shrink');
+	  }
+	});
+(function(){
+    'use strict';
+	var $ = jQuery;
+	$.fn.extend({
+		filterTable: function(){
+			return this.each(function(){
+				$(this).on('keyup', function(e){
+					$('.filterTable_no_results').remove();
+					var $this = $(this), 
+                        search = $this.val().toLowerCase(), 
+                        target = $this.attr('data-filters'), 
+                        $target = $(target), 
+                        $rows = $target.find('tbody tr');
+                        
+					if(search == '') {
+						$rows.show(); 
+					} else {
+						$rows.each(function(){
+							var $this = $(this);
+							$this.text().toLowerCase().indexOf(search) === -1 ? $this.hide() : $this.show();
+						})
+						if($target.find('tbody tr:visible').size() === 0) {
+							var col_count = $target.find('tr').first().find('td').size();
+							var no_results = $('<tr class="filterTable_no_results"><td colspan="'+col_count+'">No results found</td></tr>')
+							$target.find('tbody').append(no_results);
+						}
+					}
+				});
+			});
+		}
+	});
+	$('[data-action="filter"]').filterTable();
+})(jQuery);
+
+$(function(){
+    // attach table filter plugin to inputs
+	$('[data-action="filter"]').filterTable();
+	
+	$('.container').on('click', '.panel-heading span.filter', function(e){
+		var $this = $(this), 
+			$panel = $this.parents('.panel');
+		
+		$panel.find('.panel-body').slideToggle();
+		if($this.css('display') != 'none') {
+			$panel.find('.panel-body input').focus();
+		}
+	});
+	$('[data-toggle="tooltip"]').tooltip();
+})
+</script>	
+</body>
+</html>

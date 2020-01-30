@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<title>Upsolve</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+	<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+	<link href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+	<script src="//netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+	<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+	<!-- Bootstrap core CSS -->
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom fonts for this template -->
+  <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+  <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+  <!-- Custom styles for this template -->
+  <link href="css/clean-blog.min.css" rel="stylesheet">
+<style>
+nav {
+  .navbar-brand {font-size: 30px;}
+	.navbar-toggle {margin: 13px 15px 13px 0;}
+	a {
+		font-size: 18px;
+		padding-bottom: 20px !important;
+		padding-top: 20px !important;
+    transition: all 0.3s ease;
+	}
+}
+body {
+  background: #1b262c;
+  padding-top: 60px;
+}
+.row{
+		    margin-top:40px;
+		    padding: 0 10px;
+		}
+		.clickable{
+		    cursor: pointer;   
+		}
+
+		.panel-heading div {
+			margin-top: -18px;
+			font-size: 15px;
+		}
+		.panel-heading div span{
+			margin-left:5px;
+		}
+		.panel-body{
+			display: none;
+		}
+		.container {
+  padding: 2rem 0rem;
+}
+
+h4 {
+  margin: 2rem 0rem 1rem;
+}
+
+.table-image {
+  td, th {
+    vertical-align: middle;
+  }
+}
+</style>
+
+</head>
+<body>
+
+		<nav class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      
+ <a href="#" class="navbar-brand"><img style="max-width:7rem; margin-top: -28px;" src="https://i.ibb.co/KFL65K0/aaaa-4x-8.png"></a>    </div>
+    <div class="collapse navbar-collapse">
+      <ul class="nav navbar-nav pull-right">
+        <li><a href="/">Home</a></li>
+       
+        <li class="active"><a href="/blogs">Blogs</a></li>
+         <li sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_TRAINER')"><a th:href="@{/writeblog(user=${#authentication.name})}">Write Blog</a></li>
+         <li sec:authorize="hasRole('ROLE_ADMIN')"><a href="/admin">Back</a></li>
+		<li>
+		<a href="/showMyLoginPage?action=logout" class="btn btn-lg">
+          <span class="glyphicon glyphicon-log-out"></span> Log out
+        </a>
+		<!--<input type="submit" value="Logout"  />-->
+		</li>
+        
+      </ul>
+      
+    </div><!--/.nav-collapse -->
+  </div>
+</nav>
+<br>
+<br>
+<br>
+ <div class="container" style = "color:white";>
+    <div class="row" >
+      <div class="col-lg-8 col-md-10 mx-auto" th:each="tempBlog : ${blogs}">
+      	<div  th:if="${tempBlog.addedby == #authentication.name OR #authorization.expression('hasRole(''ADMIN'')')}" class="text-right" >
+	      	<a th:href="@{/updateblog(id=${tempBlog.id})}" class="btn btn-primary btn-sm" >
+						<i class="glyphicon glyphicon-pencil"></i>
+			</a>
+	      	<a  th:href="@{/deleteblog(id=${tempBlog.id})}" class="btn btn-danger btn-sm" onclick="if (!(confirm('Are you sure you want to delete this blog?'))) return false">
+						<i class="glyphicon glyphicon-trash"></i>
+			</a>
+		</div>
+        <div class="post-preview" >
+          <a th:href="@{/blog(id=${tempBlog.id})}" target="_blank">
+            <h2 class="post-title"  th:text="${tempBlog.title}"/>
+            
+          </a>
+          <h5 class="post-subtitle"  style = "color:#cccccc"; th:text="${tempBlog.description}"/>
+      <h4> Posted by    <span class="post-meta" th:text="${tempBlog.addedby}"/></h3>
+        </div>
+        <hr>  
+      </div>
+    </div>
+  </div>
+	 
+
+
+
+
+
+
+
+
+
+
+<script>
+$(window).scroll(function() {
+	  if ($(document).scrollTop() > 50) {
+	    $('nav').addClass('shrink');
+	  } else {
+	    $('nav').removeClass('shrink');
+	  }
+	});
+(function(){
+    'use strict';
+	var $ = jQuery;
+	$.fn.extend({
+		filterTable: function(){
+			return this.each(function(){
+				$(this).on('keyup', function(e){
+					$('.filterTable_no_results').remove();
+					var $this = $(this), 
+                        search = $this.val().toLowerCase(), 
+                        target = $this.attr('data-filters'), 
+                        $target = $(target), 
+                        $rows = $target.find('tbody tr');
+                        
+					if(search == '') {
+						$rows.show(); 
+					} else {
+						$rows.each(function(){
+							var $this = $(this);
+							$this.text().toLowerCase().indexOf(search) === -1 ? $this.hide() : $this.show();
+						})
+						if($target.find('tbody tr:visible').size() === 0) {
+							var col_count = $target.find('tr').first().find('td').size();
+							var no_results = $('<tr class="filterTable_no_results"><td colspan="'+col_count+'">No results found</td></tr>')
+							$target.find('tbody').append(no_results);
+						}
+					}
+				});
+			});
+		}
+	});
+	$('[data-action="filter"]').filterTable();
+})(jQuery);
+
+$(function(){
+    // attach table filter plugin to inputs
+	$('[data-action="filter"]').filterTable();
+	
+	$('.container').on('click', '.panel-heading span.filter', function(e){
+		var $this = $(this), 
+			$panel = $this.parents('.panel');
+		
+		$panel.find('.panel-body').slideToggle();
+		if($this.css('display') != 'none') {
+			$panel.find('.panel-body input').focus();
+		}
+	});
+	$('[data-toggle="tooltip"]').tooltip();
+})
+</script>	
+</body>
+</html>

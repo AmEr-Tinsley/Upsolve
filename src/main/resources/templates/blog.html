@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+  <title>Upsolve</title>
+
+<style>
+body {
+  font-family: Arial;
+  padding: 20px;
+  
+  background: #1b262c;
+}
+
+/* Header/Blog Title */
+.header {
+  padding: 30px;
+  font-size: 40px;
+  text-align: center;
+  background:  #101010;
+  color:white;
+}
+
+/* Create two unequal columns that floats next to each other */
+/* Left column */
+
+.user_name{
+    font-size:14px;
+    font-weight: bold;
+    color :  #4d4dff;
+}
+.comments-list .media{
+   border-bottom: 1px dotted #ccc;
+    color:white;
+}
+
+/* Fake image */
+.fakeimg {
+  background-color: #aaa;
+  width: 100%;
+  padding: 20px;
+}
+
+/* Add a card effect for articles */
+.card {
+  background-color:  #101010;
+  padding: 20px;
+  margin-top: 20px;
+  color : white;
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Footer */
+.footer {
+  padding: 20px;
+  text-align: center;
+  background: #ddd;
+  margin-top: 20px;
+}
+
+/* Responsive layout - when the screen is less than 800px wide, make the two columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 800px) {
+  .leftcolumn, .rightcolumn {
+    width: 100%;
+    padding: 0;
+  }
+}
+div.centre {
+    border: 1px solid black;
+    display: inline-block;
+    max-width: 900px;
+    padding: 10px;
+    word-break: break-all;
+  
+  display: block;
+  background-color: #101010;
+  margin-left: auto;
+  margin-right: auto;
+  
+}
+
+</style>
+</head>
+
+<body>
+
+
+ <div class="centre" >
+ <div class="header">
+  <h1 th:text="${blog.title}"/>
+</div>
+</div>
+
+<div class="row">
+  <div class="centre" >
+    <div class="card" >
+     
+     <div th:remove="tag" th:utext="${blog.content}"></div>
+     
+     
+     
+      		
+ 
+    </div>
+    <br>
+    <br>
+    <hr>
+    <br>
+   <div class="container">
+            <div class="row">
+                <div class="col-md-8">
+                  <div class="page-header">
+                   <form th:action="@{/processAddComment(id=${blog.id})}" 
+                               th:object="${Comment}" method="POST"
+                               class="form-horizontal">
+                   <textarea class="form-control" rows="5" th:field="*{content}" required></textarea>
+                   <br>
+                   
+                   <button type="submit" class="btn btn-success btn-circle text-uppercase" ><span class="glyphicon glyphicon-send"></span> comment</button>
+                   </form>
+                    <h1 style="color:  white;"> <small class="pull-right" style="color:  #bfbfbf;"><span th:text="${n}"></span> Comments</small> Comments </h1>
+                   
+                  </div> 
+                   <div class="comments-list" th:each="tempComment : ${comments}" >
+                       <div class="media">
+                           <a th:if="${tempComment.addedby == #authentication.name OR #authorization.expression('hasRole(''ADMIN'')')}" th:href="@{/deletecomment(id=${tempComment.id})}" class="btn btn-danger btn-sm pull-right" onclick="if (!(confirm('Are you sure you want to delete this comment?'))) return false">
+											<i class="glyphicon glyphicon-trash"></i>
+							</a>
+                          
+                           
+                            <div class="media-body">
+                                
+                              <h4 th:style="${tempComment.addedby == #authentication.name ? 'color:green;':''}" class="media-heading user_name" th:text="${tempComment.addedby}"/>
+                              <br>
+                             	<p th:text="${tempComment.content}"/>
+                             
+                            </div>
+                          </div>
+                       
+                          
+                   </div>
+                    
+                    
+                    
+                </div>
+            </div>
+        </div>
+
+</body>
+
+</html>
