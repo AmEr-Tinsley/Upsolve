@@ -6,7 +6,7 @@
   - Bootstrap
   - Quill js
   
- ## Diagram class: 
+ ## Class Diagram: 
  ![Main Screen](Screenshots/diag_class/Diag-class.PNG)
  
  **Main actors :**
